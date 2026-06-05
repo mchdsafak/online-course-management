@@ -26,7 +26,22 @@ Geleneksel eğitim süreçlerinin dijitalleşmesiyle birlikte, online eğitim pl
 ## 🔄 Akış Şeması (Flowchart)
 Sistemin kullanıcı arayüzü ile veritabanı katmanları arasındaki veri işleme ve kontrol adımlarını gösteren algoritma akışı aşağıdadır:
 
-![Proje Akış Şeması](akis_semasi.png)
+```mermaid
+graph TD
+    A([Başla]) --> B[Streamlit Arayüzü Açılır]
+    B --> C{Sistem Menüsü Seçimi}
+    C -->|Kurs Listesi / Öğrenci Raporu| D[View Sorgulanır: SELECT * FROM View...]
+    D --> E[Veriler Tablo Olarak Listelenir]
+    C -->|Yeni Kurs Ekle| F[Form Alanları Doldurulur]
+    F --> G[Kursu Kaydet Butonuna Basılır]
+    G --> H[Stored Procedure Tetiklenir: Sp_KursEkle]
+    H --> I[Trigger Devreye Girer: Trg_KontenjanKontrol]
+    I --> J{Kontenjan Dolu mu?}
+    J -->|Evet| K[Hata Fırlatılır ve Kayıt İptal Edilir]
+    J -->|Hayır| L[Veritabanına Yeni Kurs Kaydedilir]
+    K --> M([Bitir])
+    L --> M
+    E --> M
 
 ---
 
@@ -40,7 +55,43 @@ Proje, iki katmanlı (Two-Tier) bir mimari yapı üzerine kurulmuştur [2]:
 ## 📊 Veri Tabanı Diyagramı (ER Diyagramı)
 Projede minimum 5 tablo mantıksal kurallarla (Primary Key, Foreign Key, Cascade, Check) birbirine bağlanmıştır [1]. Sistemin mimari şeması aşağıdadır:
 
-![Veri Tabanı ER Diyagramı](er_diyagrami.png)
+```markdown
+```mermaid
+erDiagram
+    KATEGORILER ||--o{ KURSLAR : "içerir"
+    EGITMENLER ||--o{ KURSLAR : "verir"
+    KURSLAR ||--o{ KAYITLAR : "sahiptir"
+    OGRENCILER ||--o{ KAYITLAR : "yapar"
+    
+    KATEGORILER {
+        int KategoriID PK
+        varchar KategoriAdi
+    }
+    EGITMENLER {
+        int EgitmenID PK
+        varchar EgitmenAdi
+        varchar UzmanlikAlani
+    }
+    KURSLAR {
+        int KursID PK
+        varchar KursAdi
+        text Aciklama
+        decimal Fiyat
+        int Kontenjan
+        int KategoriID FK
+        int EgitmenID FK
+    }
+    OGRENCILER {
+        int OgrenciID PK
+        varchar OgrenciAdi
+        varchar Eposta
+    }
+    KAYITLAR {
+        int KayitID PK
+        int OgrenciID FK
+        int KursID FK
+        datetime KayitTarihi
+    }
 
 ---
 
