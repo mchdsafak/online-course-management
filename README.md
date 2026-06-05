@@ -1,56 +1,86 @@
 # 📚 Online Kurs Yönetim Sistemi Paneli
 
-Bu proje, modern bir online eğitim platformunun arka plan veritabanı mimarisini ve bu mimariyi dinamik olarak yöneten bir web arayüzünü kapsaktadır. İlişkisel veritabanı tasarımı **MySQL** ile kurulmuş, kullanıcı paneli ise **Python (Streamlit)** kullanılarak geliştirilmiştir.
+Kocaeli Üniversitesi Bilişim Sistemleri Mühendisliği Bölümü - TBL331 Veritabanı Yönetim Sistemleri Dönem Projesi
 
 ---
 
-## 🛠️ Kullanılan Teknolojiler
-* **Veritabanı:** MySQL Server (İlişkisel Mimari, İndeksleme, Kayıt Kontrolleri)
-* **Arayüz (Frontend/Backend):** Python 3.12, Streamlit, Pandas
-* **Sürücü:** mysql-connector-python
+## 📝 Problem Tanımı
+Geleneksel eğitim süreçlerinin dijitalleşmesiyle birlikte, online eğitim platformlarında dinamik veri yönetimi, eş zamanlı kayıt süreçleri, kontrolsüz kontenjan aşımları ve verimsiz raporlama süreçleri büyük birer problem haline gelmiştir [1]. Bu proje; kursların, eğitmenlerin, öğrencilerin ve mali kayıtların ilişkisel bir veritabanı mimarisi altında, veri bütünlüğü kurallarına tam uyumlu şekilde yönetilmesini ve son kullanıcıya performanslı bir web arayüzü üzerinden sunulmasını amaçlamaktadır [1].
 
 ---
 
-## 📐 Veritabanı Mimarisi ve Tablo Yapıları
-
-Veritabanı, veri bütünlüğünü ve ilişkisel bütünlük kurallarını (Foreign Key, Cascade, Check Constraints) tam anlamıyla karşılayacak şekilde tasarlanmıştır.
-
-* **Kurslar:** Platformdaki eğitimlerin temel bilgilerini tutar.
-* **Kategoriler:** Kursların sınıflandırılmasını sağlar.
-* **Eğitmenler:** Kursu veren eğitmenlerin bilgilerini barındırır.
-* **Öğrenciler:** Sisteme kayıtlı kullanıcıların bilgilerini tutar.
-* **Kayıtlar:** Öğrencilerin hangi kurslara, ne zaman kaydolduğunu yönetir.
+## 🔍 Yapılan Araştırmalar
+* **Veri Tabanı Normalizasyonu:** Tablolar arasındaki veri tekrarlarını önlemek ve anomalileri gidermek amacıyla 5N (Normalizasyon) kuralları ve ilişkisel bütünlük kısıtlayıcıları araştırılmıştır [1].
+* **İş Mantığı Güvenliği:** Kontenjan kontrolleri gibi kritik işlemlerin uygulama katmanında gecikmelere sebep olmaması için doğrudan veritabanı motorunda çalışan tetikleyici (Trigger) mekanizmaları incelenmiştir [1].
+* **Sorgu Performansı:** Veri setleri büyüdüğünde arama ve listeleme işlemlerinin yavaşlamasını engellemek adına indeksleme (Index) algoritmaları analiz edilmiştir [1].
 
 ---
 
-## ⚡ Gelişmiş Veritabanı Yapıları (Zorunlu Gereksinimler)
-
-Projede veritabanı performansını artırmak ve iş mantığını otomatikleştirmek adına aşağıdaki gelişmiş SQL nesneleri kullanılmıştır:
-
-### 1. VIEW (Gelişmiş Raporlama)
-* **`View_KursDetaylari`:** Kurs adını, fiyatını, kontenjanını, ait olduğu kategoriyi ve eğitmen adını tek bir sanal tabloda birleştirerek arayüze sunar.
-* **`View_OgrenciKayitlari`:** Hangi öğrencinin hangi kursa ne zaman kaydolduğunu listeleyen detaylı kayıt raporudur.
-
-### 2. STORED PROCEDURE (İş Mantığı ve Güvenlik)
-* **`Sp_KursEkle`:** Parametrik olarak yeni bir kursun adını, açıklamasını, fiyatını, kontenjanını ve ilişkili ID'lerini alarak güvenli bir şekilde sisteme dahil eder.
-
-### 3. TRIGGER (Veri Bütünlüğü ve Kontrol)
-* **`Trg_KontenjanKontrol`:** Bir öğrenci kursa kayıt olmaya çalıştığında, ilgili kursun mevcut kontenjanını kontrol eder. Kontenjan dolmuşsa kaydı otomatik olarak engeller ve hata fırlatır.
-
-### 4. INDEX (Performans Optimize)
-* Sık sorgulanan metinsel alanlar (KursAdı, ÖğrenciEposta) ve Foreign Key sütunları üzerinde arama performansını katlamak amacıyla özel indeksleme yapıları kurulmuştur.
+## 💻 Geliştirme Ortamı
+* **Veritabanı Katmanı:** MySQL Server 8.0 & MySQL Workbench
+* **Uygulama Katmanı:** Python 3.12 & Streamlit Framework
+* **Veri Yönetimi ve Sürücüler:** Pandas, mysql-connector-python
 
 ---
 
-## 🚀 Projeyi Yerelde Çalıştırma
+## 🔄 Akış Şeması (Flowchart)
+Sistemin kullanıcı arayüzü ile veritabanı katmanları arasındaki veri işleme ve kontrol adımlarını gösteren algoritma akışı aşağıdadır:
 
-### 1. Veritabanının Kurulması
-MySQL Workbench üzerinden aşağıdaki dosyaları **sırasıyla** çalıştırın:
+![Proje Akış Şeması](akis_semasi.png)
+
+---
+
+## 📐 Yazılım Mimarisi
+Proje, iki katmanlı (Two-Tier) bir mimari yapı üzerine kurulmuştur [2]:
+1. **Veri Katmanı (Data Layer):** MySQL üzerinde çalışan ilişkisel tablolar, kısıtlayıcılar (Constraints), View'lar, Stored Procedure'ler ve Trigger'lar [1].
+2. **Sunum ve İş Mantığı Katmanı (Presentation Layer):** Python ile yazılmış, veritabanına güvenli soket bağlantısı kurarak verileri işleyen ve Streamlit ile dinamik görselleştiren web arayüzü [2][3].
+
+---
+
+## 📊 Veri Tabanı Diyagramı (ER Diyagramı)
+Projede minimum 5 tablo mantıksal kurallarla (Primary Key, Foreign Key, Cascade, Check) birbirine bağlanmıştır [1]. Sistemin mimari şeması aşağıdadır:
+
+![Veri Tabanı ER Diyagramı](er_diyagrami.png)
+
+---
+
+## ⚡ Genel Yapı ve Gelişmiş Özellikler
+
+### 1. Veri Tabanı Yapısı ve İlişkiler
+* **Tablolar:** `Kurslar`, `Kategoriler`, `Eğitmenler`, `Öğrenciler` ve `Kayıtlar` olmak üzere 5 temel tablo mevcuttur [1].
+* **Veri Bütünlüğü:** Her tabloda en az 10 adet gerçeği yansıtan anlamlı test verisi (dummy data) gömülüdür [1].
+
+### 2. Entegre Edilen Gelişmiş SQL Nesneleri
+* **VIEW (Birden Fazla):** * `View_KursDetaylari`: Kurs, kategori ve eğitmen bilgilerini birleştirerek sunar [1].
+  * `View_OgrenciKayitlari`: Öğrencilerin kurs kayıt geçmişlerini anlık raporlar [1].
+* **STORED PROCEDURE (Birden Fazla):**
+  * `Sp_KursEkle`: Parametrik olarak veritabanına güvenli kurs eklemeyi sağlar [1].
+  * `Sp_KursFiyatGuncelle`: Belirli bir kursun ücretini güncelleyen iş mantığıdır [1].
+* **TRIGGER (Birden Fazla):**
+  * `Trg_KontenjanKontrol`: Kurs kontenjanı dolduğunda yeni kaydı otomatik engeller ve hata fırlatır [1].
+  * `Trg_KayitLogla`: Başarılı her kayıttan sonra sistem log tablosuna otomatik iz bırakır [1].
+* **INDEX (Birden Fazla):**
+  * `Idx_KursAdi`: Kurs aramalarını hızlandırmak amacıyla oluşturulmuştur [1].
+  * `Idx_OgrenciEposta`: Öğrenci sorgulamalarında performans optimizasyonu sağlar [1].
+
+---
+
+## 🖥️ Geliştirilen Arayüzün Örnek Görseli
+Sistemin tıkır tıkır çalışan canlı web yönetim panelinden bir ekran görüntüsü:
+
+![Uygulama Arayüzü](arayüz.png)
+
+---
+
+## 🚀 Projenin Yüklenmesi ve Çalıştırılması
+
+### 1. Veritabanı Kurulumu
+MySQL Workbench üzerinde aşağıdaki scriptleri **sırasıyla** çalıştırın:
 1. `veritabanı_tasarımı.sql`
 2. `test_verileri.sql`
 3. `gelismis_yapilar.sql`
 
-### 2. Gerekli Kütüphanelerin Yüklenmesi
-Terminal üzerinden gerekli bağımlılıkları yükleyin:
+### 2. Kütüphanelerin Yüklenmesi
+Terminal veya komut istemi üzerinden bağımlılıkları indirin:
 ```bash
 pip install streamlit mysql-connector-python pandas
