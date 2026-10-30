@@ -4,7 +4,7 @@
 **TBL331: Veritabanı Yönetim Sistemleri (2025-2026 Bahar)**
 
 **Grup No:** 178
-**Grup Üyeleri:** Mücahid Şafak, Faruk Arslan
+**Grup Üyeleri:** Mücahid Şafak, Faruk Öztürk
 
 ---
 
